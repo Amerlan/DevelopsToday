@@ -18,27 +18,3 @@ class RegisterApi(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
-
-
-class LoginApi(APIView):
-    permission_classes = (AllowAny, )
-
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-        username = validated_data['username']
-        password = validated_data['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request=request, user=user)
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class LogoutApi(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        logout(request=request)
-        return Response(status=status.HTTP_200_OK)
