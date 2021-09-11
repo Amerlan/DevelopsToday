@@ -8,18 +8,22 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         read_only_fields = (
-            'created_at_pretty', 'upvotes', 'upvote_count',
+            'created_at_pretty', 'upvote_count',
             'link', 'author_name',
         )
         fields = read_only_fields + ('title', )
 
-    def create(self, validated_data):
+    def validate(self, data):
         request = self.context.get("request")
         user = request.user
-        validated_data['link'] = slugify(validated_data.get('title', ''))
-        post = Post(author=user, **validated_data)
-        post.save()
-        return post
+        data['author'] = user
+        data['link'] = slugify(data.get('title', ''))
+        return data
+
+    # def create(self, validated_data):
+    #     post = Post(author=user, **validated_data)
+    #     post.save()
+    #     return post
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -27,5 +31,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
-
+    def validate(self, data):
+        request = self.context.get("request")
+        post = self.context.get("post")
+        user = request.user
+        data['author'] = user
+        data['post'] = post
+        return data
 

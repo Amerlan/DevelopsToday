@@ -1,7 +1,14 @@
-from rest_framework.routers import DefaultRouter
-from .views import PostViewSet
+from django.urls import path, include
+from rest_framework_nested import routers
+from .views import PostViewSet, CommentViewSet
 
-router = DefaultRouter()
-router.register('posts', PostViewSet, basename='post')
+post_router = routers.SimpleRouter()
+post_router.register('posts', PostViewSet)
 
-urlpatterns = router.urls
+comments_router = routers.NestedSimpleRouter(post_router, 'posts', lookup='post')
+comments_router.register('comments', CommentViewSet, basename='post-comments')
+
+urlpatterns = [
+    path('', include(post_router.urls)),
+    path('', include(comments_router.urls)),
+]

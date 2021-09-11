@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Post, Comment
-from .serializers import PostSerializer
+from .serializers import PostSerializer, CommentSerializer
 
 
 class PostViewSet(ViewSet):
@@ -32,3 +32,31 @@ class PostViewSet(ViewSet):
         post.upvotes.add(request.user)
         return Response(status=status.HTTP_200_OK)
 
+    def destroy(self, request, pk):
+        post = get_object_or_404(self.queryset, link=pk)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentViewSet(ViewSet):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CommentSerializer
+
+    def list(self, request, post_pk):
+        post = get_object_or_404(Post, link=post_pk)
+        comments = Comment.objects.filter(post=post)
+        serializer = self.serializer_class(comments, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, post_pk):
+        post = get_object_or_404(Post, link=post_pk)
+        serializer = self.serializer_class(
+            data=request.data,
+            context={
+                'request': request,
+                'post': post
+            }
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
