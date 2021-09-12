@@ -8,34 +8,30 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         read_only_fields = (
-            'created_at_pretty', 'upvote_count',
-            'link', 'author_name',
+            "created_at_pretty",
+            "upvote_count",
+            "link",
+            "author_name",
         )
-        fields = read_only_fields + ('title', )
+        fields = read_only_fields + ("title",)
 
     def validate(self, data):
         request = self.context.get("request")
         user = request.user
-        data['author'] = user
-        data['link'] = slugify(data.get('title', ''))
+        data["author"] = user
+        data["link"] = slugify(data.get("title", ""))
         return data
-
-    # def create(self, validated_data):
-    #     post = Post(author=user, **validated_data)
-    #     post.save()
-    #     return post
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = "__all__"
 
     def validate(self, data):
         request = self.context.get("request")
         post = self.context.get("post")
         user = request.user
-        data['author'] = user
-        data['post'] = post
+        data["author"] = user
+        data["post"] = post
         return data
-

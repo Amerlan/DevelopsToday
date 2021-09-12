@@ -9,11 +9,11 @@ from .serializers import RegisterSerializer, LoginSerializer
 
 
 class RegisterApi(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         if request.user.is_authenticated:
-            raise ValidationError('Only new users can signup')
+            raise ValidationError("Only new users can signup")
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

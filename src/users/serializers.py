@@ -10,19 +10,19 @@ class RegisterSerializer(serializers.Serializer):
     password2 = serializers.CharField(max_length=50)
 
     def validate(self, data):
-        if data['password1'] != data['password2']:
-            raise ValidationError('Passwords don’t match.')
-        data.pop('password2')
-        data['password'] = data.pop('password1')
+        if data["password1"] != data["password2"]:
+            raise ValidationError("Passwords don’t match.")
+        data.pop("password2")
+        data["password"] = data.pop("password1")
         return data
 
     def create(self, validated_data):
         try:
-            user = User(username=validated_data['username'])
-            user.set_password(validated_data['password'])
+            user = User(username=validated_data["username"])
+            user.set_password(validated_data["password"])
             user.save()
         except IntegrityError:
-            raise ValidationError('Username is taken.')
+            raise ValidationError("Username is taken.")
         return user
 
 
